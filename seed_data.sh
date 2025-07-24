@@ -3,8 +3,9 @@ echo "🌱 Starting seed data insertion..."
 echo "=================================================="
 echo "############### WAITING FOR TABLES TO BE CREATED ###################"
 
+# Función para detectar el sistema operativo y hacer sleep
 cross_platform_sleep() {
-    local seconds=$1
+    seconds=$1
     if command -v sleep >/dev/null 2>&1; then
         # Unix/Linux/macOS/Git Bash en Windows
         sleep "$seconds"
@@ -13,7 +14,7 @@ cross_platform_sleep() {
         timeout /t "$seconds" /nobreak >/dev/null 2>&1
     elif command -v ping >/dev/null 2>&1; then
         # Fallback usando ping (funciona en Windows y Unix)
-        if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ -n "$WINDIR" ]]; then
+        if [ "$OSTYPE" = "msys" ] || [ "$OSTYPE" = "cygwin" ] || [ -n "$WINDIR" ]; then
             # Windows
             ping -n $((seconds + 1)) 127.0.0.1 >/dev/null 2>&1
         else
@@ -29,10 +30,10 @@ cross_platform_sleep() {
     fi
 }
 
-cross_platform_sleep 6
-
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
+cross_platform_sleep 6
+
 sqlite3 "$DB_FILE" << 'EOF'
 INSERT OR IGNORE INTO categories (name) VALUES
 ('Restaurante'),
@@ -75,8 +76,7 @@ EOF
 echo "   ✅ Locations inserted"
 echo "🔗 Creating relationship location-category..."
 # Inserting relationships into location_category_reviewed
-sleep 6
-sqlite3 "$DB_FILE" << "EOF"
+sqlite3 "$DB_FILE" << 'EOF'
 -- Parque Explora -> Museo, Parque
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
@@ -164,8 +164,8 @@ EOF
 echo "   ✅ Relationships inserted"
 echo "=================================================="
 echo "🎉 ¡Data seed inserted successfully!"
-echo "   📊 Sumary:"
+echo "   📊 Summary:"
 echo "      • 10 Categories"
-echo "      • 20 Locatrions"
+echo "      • 20 Locations"
 echo "      • Relationships between locations and categories"
 echo "=================================================="
