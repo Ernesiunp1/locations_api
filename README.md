@@ -9,7 +9,11 @@ El proyecto está dockerizado para facilitar el despliegue y el desarrollo.
 El mismo fue desplegado para comodidad
 de la corrección del proyecto, se encuentra con un EC2 linux al cual se le desplegaron los contenedores
 de Docker y se editaron las reglas de los securities groups para que cualquiera pueda acceder a él.
-Puedes acceder a la API en el siguiente enlace:
+Puedes acceder a la API en los siguientes enlaces:
+
+### SandBox de pruebas para crear Locations con mapa interactivo http://100.28.48.90:8000/
+
+### Documentacion interactiva Swager para prueba de los endpoints: http://100.28.48.90:8000/docs/
 
 
 ## Si se desea realizar la instalación en local, puede seguir con las siguientes indicaciones abajo descritas
