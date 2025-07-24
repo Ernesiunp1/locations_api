@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map My World</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #eef1f4;
+        }
+
+        #form-container {
+            width: 40%;
+            padding: 20px;
+            box-sizing: border-box;
+            background: #ffffff;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #map-wrapper {
+            width: 60%;
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .map-card {
+            width: 100%;
+            height: 70vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+        }
+
+        #map {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #message {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="form-container">
+        <h3>Añadir Nueva Ubicación</h3>
+        <form id="location-form">
+            <label>Nombre del lugar:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label>Categorías existentes:</label>
+            <select id="category_ids" name="category_ids" multiple required>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Agregar una categoría nueva (opcional):</label>
+            <input type="text" id="new_category" name="new_category" placeholder="Ej: Monumento histórico">
+
+            <label>Opinión:</label>
+            <textarea id="opinion" name="opinion" rows="4"></textarea>
+
+            <label>Puntaje (1-5 estrellas):</label>
+            <select id="rating" name="rating" required>
+                <option value="">--Selecciona--</option>
+                <option value=1>⭐</option>
+                <option value=2>⭐⭐</option>
+                <option value=3>⭐⭐⭐</option>
+                <option value=4>⭐⭐⭐⭐</option>
+                <option value=5>⭐⭐⭐⭐⭐</option>
+            </select>
+
+            <label>Latitud:</label>
+            <input type="text" id="lat" name="lat" required readonly>
+
+            <label>Longitud:</label>
+            <input type="text" id="lon" name="lon" required readonly>
+
+            <button type="submit">Añadir</button>
+        </form>
+        <div id="message"></div>
+        <p>💡 Haz clic en el mapa para llenar las coordenadas automáticamente.</p>
+    </div>
+
+    <div id="map-wrapper">
+        <div class="map-card">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        function loadMarkers() {
+            fetch("/locations")
+                .then(res => res.json())
+                .then(locations => {
+                    locations.forEach(loc => {
+                        L.marker([loc.latitude, loc.longitude])
+                            .addTo(map)
+                            .bindPopup(`
+                                <strong>${loc.name}</strong><br>
+                                Categoría: ${loc.category}<br>
+                                Opinión: ${loc.opinion}<br>
+                                Puntaje: ${'⭐'.repeat(loc.rating)}
+                            `);
+                    });
+                });
+        }
+
+        loadMarkers();
+
+        map.on("click", function(e) {
+            const { lat, lng } = e.latlng;
+            document.getElementById("lat").value = lat.toFixed(6);
+            document.getElementById("lon").value = lng.toFixed(6);
+        });
+
+        document.getElementById("location-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const selectedOptions = document.getElementById("category_ids").selectedOptions;
+            const category_ids = Array.from(selectedOptions).map(option => parseInt(option.value));
+
+            const new_category = document.getElementById("new_category").value;
+            const new_categories = new_category ? [new_category] : [];
+
+            const data = {
+                name: document.getElementById("name").value,
+                category_ids: category_ids,
+                new_categories: new_categories,
+                description: document.getElementById("opinion").value,
+                rate: parseFloat(document.getElementById("rating").value),
+                latitude: parseFloat(document.getElementById("lat").value),
+                longitude: parseFloat(document.getElementById("lon").value)
+            };
+
+            fetch("/locations/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (res.ok) {
+                    document.getElementById("message").innerText = "✅ ¡Ubicación agregada!";
+                    map.eachLayer(layer => {
+                        if (layer instanceof L.Marker && !layer._url) map.removeLayer(layer);
+                    });
+                    loadMarkers();
+                    document.getElementById("location-form").reset();
+                } else {
+                    document.getElementById("message").innerText = "❌ Error al agregar ubicación.";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  app:
+    container_name: my_map
+    image: my_map
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_PATH=sqlite:////app/data/map.db
+    volumes:
+      - ./data:/app/data
