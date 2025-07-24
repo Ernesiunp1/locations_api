@@ -11,6 +11,7 @@ from utils.default_categories import create_default_categories
 from fastapi.middleware.cors import CORSMiddleware
 from db.database import create_tables
 import warnings
+from seed_py import main as seed_data
 
 warnings.filterwarnings("ignore", category=SAWarning)
 
@@ -57,3 +58,4 @@ def startup_event():
     db = next(get_db())
     create_default_categories(db)
     create_tables()
+    seed_data()
