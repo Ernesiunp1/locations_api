@@ -4,18 +4,11 @@ echo "🌱 Starting seed data insertion..."
 echo "=================================================="
 
 
-# Wait for the application to be ready and tables to be created
-echo "⏳ Esperando que las tablas se creen..."
-echo "⏳ Waiting for tables to be created..."
+echo "############### WAITING FOR TABLES TO BE CREATED ###################"
 sleep 5
-
-
 DB_FILE="${DB_FILE:-./map.db}"
-
-
 echo "🏷️ Inserting categories..."
 
-# Insert categoríes
 sqlite3 $DB_FILE << 'EOF'
 INSERT OR IGNORE INTO categories (name) VALUES
 ('Restaurante'),
