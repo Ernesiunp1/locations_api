@@ -8,7 +8,7 @@ class CategoryOut(BaseModel):
     name: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LocationSchema(BaseModel):
@@ -19,7 +19,7 @@ class LocationSchema(BaseModel):
     categories: list[CategoryOut]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LocationOut(BaseModel):
@@ -35,7 +35,7 @@ class LocationOut(BaseModel):
     categories: list[CategoryOut] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LocationCreate(BaseModel):
@@ -84,7 +84,7 @@ class LocationCategoryOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class RecommendationOut(BaseModel):
