@@ -2,6 +2,35 @@
 echo "🌱 Starting seed data insertion..."
 echo "=================================================="
 echo "############### WAITING FOR TABLES TO BE CREATED ###################"
+
+cross_platform_sleep() {
+    local seconds=$1
+    if command -v sleep >/dev/null 2>&1; then
+        # Unix/Linux/macOS/Git Bash en Windows
+        sleep "$seconds"
+    elif command -v timeout >/dev/null 2>&1; then
+        # Windows CMD con timeout
+        timeout /t "$seconds" /nobreak >/dev/null 2>&1
+    elif command -v ping >/dev/null 2>&1; then
+        # Fallback usando ping (funciona en Windows y Unix)
+        if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] || [[ -n "$WINDIR" ]]; then
+            # Windows
+            ping -n $((seconds + 1)) 127.0.0.1 >/dev/null 2>&1
+        else
+            # Unix/Linux
+            ping -c "$seconds" 127.0.0.1 >/dev/null 2>&1
+        fi
+    else
+        # Último recurso: loop con date (más lento pero universal)
+        local end_time=$(($(date +%s) + seconds))
+        while [ $(date +%s) -lt $end_time ]; do
+            :
+        done
+    fi
+}
+
+cross_platform_sleep 6
+
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
 sqlite3 "$DB_FILE" << 'EOF'
