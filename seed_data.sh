@@ -2,7 +2,6 @@
 echo "🌱 Starting seed data insertion..."
 echo "=================================================="
 echo "############### WAITING FOR TABLES TO BE CREATED ###################"
-sleep 5
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
 sqlite3 "$DB_FILE" << 'EOF'

@@ -25,7 +25,7 @@ def create_new_location(location: LocationCreate, db: Session = Depends(get_db))
         db.add(new_location)
         db.commit()
         db.refresh(new_location)
-        print("voy por aqui")
+
         # Asociar categorías existentes
         for category_id in location.category_ids:
             association = LocationCategoryReviewed(
