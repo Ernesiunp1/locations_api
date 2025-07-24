@@ -46,10 +46,7 @@ EOF
 echo "   ✅ Locations inserted"
 echo "🔗 Creating relationship location-category..."
 # Inserting relationships into location_category_reviewed
-START=$(date +%s)
 sleep 6
-END=$(date +%s)
-echo "⏱️ Took $((END - START)) seconds"
 sqlite3 "$DB_FILE" << "EOF"
 -- Parque Explora -> Museo, Parque
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
