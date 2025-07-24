@@ -24,6 +24,7 @@ def get_fresh_recommendations(db: Session):
 
     # Consulta principal: combinaciones no revisadas recientemente
     results = db.query(
+        LCR.id,
         LCR.location_id,
         LCR.category_id,
         Loc.name.label('location_name'),
@@ -39,6 +40,7 @@ def get_fresh_recommendations(db: Session):
 
     return [
         RecommendationOut(
+            id=r.id,
             location_id=r.location_id,
             category_id=r.category_id,
             location_name=r.location_name,

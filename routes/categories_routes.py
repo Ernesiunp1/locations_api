@@ -1,7 +1,7 @@
 from db.database import get_db
 from models.models import Category
 from sqlalchemy.orm import Session
-from schemas.schemas import CategoryCreate, CategoryOut
+from schemas.schemas import CategoryCreate, CategoryOut, CategoryUpdate
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from fastapi import APIRouter, Depends, status, HTTPException
 
@@ -37,6 +37,7 @@ def list_all_categories(db: Session = Depends(get_db)):
         if not categories:
             raise HTTPException(status_code=404, detail="No categories found")
         return categories
+
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error occurred while retrieving categories")
 
@@ -49,12 +50,13 @@ def get_category_by_id(category_id: int, db: Session = Depends(get_db)):
         if not category:
             raise HTTPException(status_code=404, detail="Category not found")
         return category
+
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error while retrieving category")
 
 
 @router.put("/categories/{category_id}", response_model=CategoryOut)
-def update_category_by_id(category_id: int, updated: CategoryCreate, db: Session = Depends(get_db)):
+def update_category_by_id(category_id: int, updated: CategoryUpdate, db: Session = Depends(get_db)):
     """Update a specific category by ID."""
     try:
         category = db.query(Category).filter(Category.id == category_id).first()

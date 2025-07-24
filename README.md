@@ -196,17 +196,24 @@ uvicorn main:app --reload
 
 ### 📜 Rutas del API
 
-| Método | Ruta                    | Descripción                                     |
-| ------ |-------------------------|-------------------------------------------------|
-| GET    | `/`                     | Página principal con el mapa (sandbox)          |
-| GET    | `/docs`                 | Documentacion interactiva Swager                |
-| POST   | `/locations/`           | Crear una nueva ubicación                       |
-| GET    | `/list/locations`       | Listar todas las ubicaciones                    |
-| POST   | `/categories/`          | Crear una nueva categoría                       |
-| GET    | `/list/categories/`     | Listar todas las categorías                     |
-| POST   | `/location-categories/` | Asociar una ubicación con una categoría         |
-| POST   | `/reviews/`             | Marcar una ubicación-categoría como revisada    |
-| GET    | `/recommendations/`     | Obtener 10 combinaciones que necesitan revisión |
+| Método | Ruta                        | Descripción                                     |
+|--------|-----------------------------|-------------------------------------------------|
+| GET    | `/`                         | Página principal con el mapa (sandbox)          |
+| GET    | `/docs`                     | Documentacion interactiva Swager                |
+| POST   | `/locations/`               | Crear una nueva ubicación                       |
+| GET    | `/list/locations`           | Listar todas las ubicaciones                    |
+| GET    | `/locations/{location_id}`  | obtiene la ubicacion por id                     |
+| PUT    | `/locations/{location_id}`  | actualiza la ubicacion por id                   |
+| DEL    | `/locations/{location_id}`  | elimina la ubicacion por id                     |
+| POST   | `/categories/`              | Crear una nueva categoría                       |
+| GET    | `/list/categories/`         | Listar todas las categorías                     |
+| GET    | `/categories/{category_id}` | obtiene la categoria por id                     |
+| PUT    | `/categories/{category_id}` | Actualiza la categoria por id                   |
+| DEL    | `/categories/{category_id}` | Elimina la categoria por id                     |
+| POST   | `/location-categories/`     | Asociar una ubicación con una categoría         |
+| POST   | `/mark/reviews/`            | Marcar una ubicación-categoría como revisada    |
+| GET    | `/recommendations/reviews`  | Obtener 10 locaciones que necesitan revisión    |
+| GET    | `/reviews/pending`          | Obtener 10 combinaciones lon-lati para revisión |
 ```
 
 

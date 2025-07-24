@@ -1,7 +1,7 @@
 from db.database import get_db
 from fastapi import APIRouter
 from models.models import Location, Category, LocationCategoryReviewed
-from schemas.schemas import LocationSchema, LocationCreate, LocationOut
+from schemas.schemas import LocationSchema, LocationCreate, LocationOut, LocationUpdate
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, selectinload
@@ -66,6 +66,7 @@ def list_all_locations(db: Session = Depends(get_db)):
     try:
         locations = db.query(Location).options(selectinload(Location.categories)).all()
         return locations
+
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error while retrieving locations")
 
@@ -78,28 +79,41 @@ def get_location_by_id(location_id: int, db: Session = Depends(get_db)):
         if not location:
             raise HTTPException(status_code=404, detail="Location not found")
         return location
+
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Database error while retrieving location")
 
 
-@router.put("/locations/{location_id}", response_model=LocationSchema)
-def update_location_by_id(location_id: int, location: LocationCreate, db: Session = Depends(get_db)):
+@router.put("/locations/{location_id}", response_model=LocationOut)
+def update_location_by_id(location_id: int, location: LocationUpdate, db: Session = Depends(get_db)):
     """Update a specific location by ID."""
     try:
         existing_location = db.query(Location).filter(Location.id == location_id).first()
         if not existing_location:
             raise HTTPException(status_code=404, detail="Location not found")
 
-        existing_location.latitude = location.latitude
-        existing_location.longitude = location.longitude
-        existing_location.name = location.name
-        existing_location.rate = location.rate
-        existing_location.description = location.description
+        if location.name is not None:
+            existing_location.name = location.name
+        if location.latitude is not None:
+            existing_location.latitude = location.latitude
+        if location.longitude is not None:
+            existing_location.longitude = location.longitude
+        if location.rate is not None:
+            existing_location.rate = location.rate
+        if location.description is not None:
+            existing_location.description = location.description
+        if location.created_at is not None:
+            existing_location.created_at = location.created_at
+        if location.updated_at is not None:
+            existing_location.updated_at = location.updated_at
 
-        # Limpiar relaciones previas
-        db.query(LocationCategoryReviewed).filter(LocationCategoryReviewed.location_id == id).delete()
+        # Clear previous relationships only if there are changes
+        if location.category_ids or location.new_categories:
+            db.query(LocationCategoryReviewed).filter(
+                LocationCategoryReviewed.location_id == location_id
+            ).delete()
 
-        # Asociar categorías nuevas
+        # Asociate existing categories
         for category_id in location.category_ids:
             association = LocationCategoryReviewed(
                 location_id=existing_location.id,
@@ -107,6 +121,7 @@ def update_location_by_id(location_id: int, location: LocationCreate, db: Sessio
             )
             db.add(association)
 
+        # Make sure to create new categories if they are provided
         for category_name in location.new_categories:
             existing = db.query(Category).filter(Category.name == category_name).first()
             if not existing:
@@ -143,8 +158,7 @@ def delete_location(location_id: int, db: Session = Depends(get_db)):
 
         db.delete(location)
         db.commit()
-        return  # No content (204)
-
+        return {"detail": "Location deleted successfully"}
     except SQLAlchemyError:
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error while deleting location")
