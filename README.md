@@ -107,6 +107,10 @@ https://www.hostinger.com/co/tutoriales/como-instalar-y-usar-docker-en-ubuntu
 Puedes hacerlo siguiendo la documentacion oficial en el siguiente enlace:
 https://docs.docker.com/desktop/setup/install/windows-install/
 
+## nota: para algunos ambientes windows es posible que la semilla arroje un log de error, visto que no se ha generado la version multiplataforma
+
+### por tal motivo al final del Dockerfile  existen dos CMD una de ellos comentados, puedes intercambiarlos para probar nuevamente en caso de error 
+
 ---
 
 ## 📝 2) Requisitos (si corres sin Docker)
