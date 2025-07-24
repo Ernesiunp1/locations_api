@@ -2,7 +2,6 @@
 echo "🌱 Starting seed data insertion..."
 echo "=================================================="
 echo "############### WAITING FOR TABLES TO BE CREATED ###################"
-time sleep 6
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
 sqlite3 "$DB_FILE" << 'EOF'
@@ -47,7 +46,11 @@ EOF
 echo "   ✅ Locations inserted"
 echo "🔗 Creating relationship location-category..."
 # Inserting relationships into location_category_reviewed
-sqlite3 "$DB_FILE" << 'EOF'
+START=$(date +%s)
+sleep 6
+END=$(date +%s)
+echo "⏱️ Took $((END - START)) seconds"
+sqlite3 "$DB_FILE" << "EOF"
 -- Parque Explora -> Museo, Parque
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
