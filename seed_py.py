@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Script para insertar datos semilla en la base de datos SQLite
-Compatible con Windows, Linux y macOS
-"""
-
 import sqlite3
 import time
 import os
