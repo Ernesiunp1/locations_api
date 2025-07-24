@@ -9,7 +9,7 @@ sleep 5
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
 
-sqlite3 $DB_FILE << 'EOF'
+sqlite3 "$DB_FILE" << 'EOF'
 INSERT OR IGNORE INTO categories (name) VALUES
 ('Restaurante'),
 ('Parque'),
@@ -28,7 +28,7 @@ echo " ✅ Categories inserted"
 echo "📍 Inserting Locations..."
 
 # Insert locations
-sqlite3 $DB_FILE << 'EOF'
+sqlite3 "$DB_FILE" << 'EOF'
 INSERT OR IGNORE INTO locations (name, latitude, longitude, rate, description, created_at, updated_at) VALUES
 ('Parque Explora', 6.2518400, -75.5635900, 4.5, 'Museo interactivo de ciencias con planetario y acuario', datetime('now'), datetime('now')),
 ('Universidad de Antioquia', 6.2669700, -75.5664300, 4.2, 'Principal universidad pública de Antioquia', datetime('now'), datetime('now')),
@@ -57,7 +57,7 @@ echo "   ✅ Locations inserted"
 echo "🔗 Creating relationship location-category..."
 
 # Inserting relationships into location_category_reviewed
-sqlite3 $DB_FILE << 'EOF'
+sqlite3 "$DB_FILE" << 'EOF'
 -- Parque Explora -> Museo, Parque
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
