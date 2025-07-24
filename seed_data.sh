@@ -2,7 +2,7 @@
 echo "🌱 Starting seed data insertion..."
 echo "=================================================="
 echo "############### WAITING FOR TABLES TO BE CREATED ###################"
-
+sleep 5
 
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
@@ -47,6 +47,7 @@ INSERT OR IGNORE INTO locations (name, latitude, longitude, rate, description, c
 ('Parque de los Deseos', 6.270600, -75.566600, 4.4, 'Parque urbano con cine al aire libre y eventos culturales', datetime('now'), datetime('now')),
 ('Casa Museo Pedro Nel Gómez', 6.274400, -75.554300, 4.2, 'Museo dedicado al artista y urbanista paisa', datetime('now'), datetime('now'));
 EOF
+sleep 2
 echo "   ✅ Locations inserted"
 echo "🔗 Creating relationship location-category..."
 # Inserting relationships into location_category_reviewed
