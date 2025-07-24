@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from sqlalchemy.exc import SAWarning
+
 from db.database import engine, Base, get_db
 from routes.general_routes import router as crud_router
 from routes.locations_routes import router as locations_router
@@ -8,7 +10,9 @@ from routes.categories_routes import router as categories_router
 from utils.default_categories import create_default_categories
 from fastapi.middleware.cors import CORSMiddleware
 from db.database import create_tables
+import warnings
 
+warnings.filterwarnings("ignore", category=SAWarning)
 
 app = FastAPI(title="Map My World Rest API",
               description="A simple FastAPI Rest API with CRUD operations and default categories. includes"

@@ -1,14 +1,10 @@
 #!/bin/bash
-
 echo "🌱 Starting seed data insertion..."
 echo "=================================================="
-
-
 echo "############### WAITING FOR TABLES TO BE CREATED ###################"
 sleep 5
 DB_FILE="${DB_FILE:-./map.db}"
 echo "🏷️ Inserting categories..."
-
 sqlite3 "$DB_FILE" << 'EOF'
 INSERT OR IGNORE INTO categories (name) VALUES
 ('Restaurante'),
@@ -22,11 +18,8 @@ INSERT OR IGNORE INTO categories (name) VALUES
 ('Gimnasio'),
 ('Café');
 EOF
-
 echo " ✅ Categories inserted"
-
 echo "📍 Inserting Locations..."
-
 # Insert locations
 sqlite3 "$DB_FILE" << 'EOF'
 INSERT OR IGNORE INTO locations (name, latitude, longitude, rate, description, created_at, updated_at) VALUES
@@ -51,93 +44,74 @@ INSERT OR IGNORE INTO locations (name, latitude, longitude, rate, description, c
 ('Parque de los Deseos', 6.270600, -75.566600, 4.4, 'Parque urbano con cine al aire libre y eventos culturales', datetime('now'), datetime('now')),
 ('Casa Museo Pedro Nel Gómez', 6.274400, -75.554300, 4.2, 'Museo dedicado al artista y urbanista paisa', datetime('now'), datetime('now'));
 EOF
-
 echo "   ✅ Locations inserted"
-
 echo "🔗 Creating relationship location-category..."
-
 # Inserting relationships into location_category_reviewed
 sqlite3 "$DB_FILE" << 'EOF'
 -- Parque Explora -> Museo, Parque
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Parque Explora' AND c.name IN ('Museo', 'Parque');
-
 -- Universidad de Antioquia -> Universidad
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Universidad de Antioquia' AND c.name = 'Universidad';
-
 -- Centro Comercial Santa Fe -> Centro Comercial, Restaurante
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Centro Comercial Santa Fe' AND c.name IN ('Centro Comercial', 'Restaurante');
-
 -- Parque Arví -> Parque
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Parque Arví' AND c.name = 'Parque';
-
 -- Teatro Metropolitano -> Teatro
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Teatro Metropolitano' AND c.name = 'Teatro';
-
 -- Hospital Pablo Tobón Uribe -> Hospital
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Hospital Pablo Tobón Uribe' AND c.name = 'Hospital';
-
 -- Biblioteca EPM -> Biblioteca
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Biblioteca EPM' AND c.name = 'Biblioteca';
-
 -- Café Pergamino -> Café, Restaurante
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Café Pergamino' AND c.name IN ('Café', 'Restaurante');
-
 -- SmartFit Poblado -> Gimnasio
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'SmartFit Poblado' AND c.name = 'Gimnasio';
-
 -- Museo de Antioquia -> Museo
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Museo de Antioquia' AND c.name = 'Museo';
-
 -- Jardín Botánico -> Parque (revisión vieja)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id, was_reviewed, last_reviewed)
 SELECT l.id, c.id, 1, datetime('now', '-60 days') FROM locations l, categories c
 WHERE l.name = 'Jardín Botánico de Medellín' AND c.name = 'Parque';
-
 -- Plaza Botero -> Museo (nunca revisado)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Plaza Botero' AND c.name = 'Museo';
-
 -- Aeropuerto Olaya -> Restaurante (revisión reciente)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id, was_reviewed, last_reviewed)
 SELECT l.id, c.id, 1, datetime('now', '-5 days') FROM locations l, categories c
 WHERE l.name = 'Aeropuerto Olaya Herrera' AND c.name = 'Restaurante';
-
 -- Mercado del Río -> Restaurante (nunca revisado)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
 WHERE l.name = 'Mercado del Río' AND c.name = 'Restaurante';
-
 -- Cerro Nutibara -> Parque (revisión vieja)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id, was_reviewed, last_reviewed)
 SELECT l.id, c.id, 1, datetime('now', '-90 days') FROM locations l, categories c
 WHERE l.name = 'Cerro Nutibara' AND c.name = 'Parque';
-
 -- Planetario -> Museo (revisión reciente)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id, was_reviewed, last_reviewed)
 SELECT l.id, c.id, 1, datetime('now', '-2 days') FROM locations l, categories c
 WHERE l.name = 'Planetario de Medellín' AND c.name = 'Museo';
-
 -- Estación San Antonio -> Gimnasio (nunca revisado)
 INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id)
 SELECT l.id, c.id FROM locations l, categories c
@@ -158,9 +132,7 @@ INSERT OR IGNORE INTO location_category_reviewed (location_id, category_id, was_
 SELECT l.id, c.id, 1, datetime('now', '-1 day') FROM locations l, categories c
 WHERE l.name = 'Casa Museo Pedro Nel Gómez' AND c.name = 'Museo';
 EOF
-
 echo "   ✅ Relationships inserted"
-
 echo "=================================================="
 echo "🎉 ¡Data seed inserted successfully!"
 echo "   📊 Sumary:"
